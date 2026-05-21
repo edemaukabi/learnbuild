@@ -7,6 +7,11 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { PaymentModule } from './payments/payment.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CoursesModule } from './courses/courses.module';
+import { SectionsModule } from './sections/sections.module';
+import { LessonsModule } from './lessons/lessons.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -33,6 +38,11 @@ import { PaymentModule } from './payments/payment.module';
     AuthModule,
     HealthModule,
     PaymentModule,
+    CategoriesModule,
+    CoursesModule,
+    SectionsModule,
+    LessonsModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

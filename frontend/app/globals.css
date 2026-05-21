@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens ───────────────────────────────── */
+:root {
+  --bg: #070D14;
+  --surface: #0F1923;
+  --card: #1A2535;
+  --card-2: #1F2C40;
+  --card-3: #243349;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --fg: #F0F6FF;
+  --fg-2: #94A3B8;
+  --fg-3: #64748B;
+  --fg-4: #475569;
+
+  --sky: #0EA5E9;
+  --sky-2: #38BDF8;
+  --sky-soft: rgba(14, 165, 233, 0.12);
+  --sky-edge: rgba(14, 165, 233, 0.34);
+
+  --teal: #0D9488;
+  --teal-2: #14B8A6;
+  --teal-soft: rgba(13, 148, 136, 0.14);
+  --teal-edge: rgba(13, 148, 136, 0.36);
+
+  --amber: #FCD34D;
+  --amber-2: #FBBF24;
+  --amber-soft: rgba(252, 211, 77, 0.10);
+  --amber-edge: rgba(252, 211, 77, 0.36);
+
+  --rose: #F43F5E;
+  --violet: #A78BFA;
+  --chrome-bg: rgba(7, 13, 20, 0.78);
+
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 14px;
+  --r-2xl: 18px;
+  --r-pill: 999px;
+
+  --t-fast: 120ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  --t: 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  --t-slow: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --bg: #F4F7FB;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --card-2: #F1F5F9;
+  --card-3: #E2E8F0;
+  --border: rgba(15, 23, 42, 0.08);
+  --border-2: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.18);
+  --fg: #0B1426;
+  --fg-2: #475569;
+  --fg-3: #64748B;
+  --fg-4: #94A3B8;
+  --sky-soft: rgba(14, 165, 233, 0.10);
+  --sky-edge: rgba(14, 165, 233, 0.30);
+  --teal-soft: rgba(13, 148, 136, 0.10);
+  --teal-edge: rgba(13, 148, 136, 0.32);
+  --amber-soft: rgba(252, 211, 77, 0.22);
+  --amber-edge: rgba(217, 162, 10, 0.42);
+  --chrome-bg: rgba(255, 255, 255, 0.82);
+}
+
+/* ─── Base ──────────────────────────────────────── */
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Brand mark ───────────────────────────────── */
+.brand-mark {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0EA5E9 0%, #0D9488 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  flex-shrink: 0;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* ─── Scrollbar ────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--r-pill);
+}
