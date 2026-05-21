@@ -30,7 +30,7 @@ LearnBuild is a full-stack E-Learning LMS platform for instructors to create and
 | Auth | Passport.js + JWT strategy + httpOnly cookies |
 | Admin panel | AdminJS + Prisma adapter |
 | Email | Nodemailer + Gmail App Password |
-| Payments | Stripe Checkout + Webhooks |
+| Payments | Paystack (abstracted — provider-agnostic interface) |
 | File storage | Cloudflare R2 (S3-compatible) |
 | Video hosting | Bunny.net Stream (HLS, CDN, signed URLs) |
 | PDF generation | pdfkit (certificates) |
@@ -71,10 +71,15 @@ LearnBuild is a full-stack E-Learning LMS platform for instructors to create and
 - Frontend: Axios with `withCredentials: true` — no token in localStorage, no Authorization header
 - Never store tokens in localStorage — this is an LMS with real users and payment data
 
-### Stripe — webhook-driven enrollment
-- NEVER trust the frontend redirect after Stripe Checkout
-- Enrollment only happens inside the webhook handler (`checkout.session.completed`)
-- Raw body required for Stripe webhook signature verification — register raw body parser before JSON parser on the webhook route
+### Payments — agnostic provider pattern
+- Payment logic lives behind `IPaymentProvider` interface — swap provider by changing one line in `PaymentModule`
+- Active provider: **Paystack** (`PaystackProvider`)
+- To add a new provider: implement `IPaymentProvider`, register in `PaymentModule`
+- Enrollment for PAID courses: backend generates reference → calls `initiatePayment()` → returns `checkoutUrl` → webhook `charge.success` triggers enrollment
+- Enrollment for FREE courses: direct `POST /courses/:id/enroll` — no payment provider involved
+- Webhook signature: HMAC-SHA512 of raw body with `PAYSTACK_WEBHOOK_SECRET`, compared against `x-paystack-signature` header
+- Raw body required: `NestFactory.create(AppModule, { rawBody: true })` in `main.ts`
+- NEVER create enrollment on frontend callback — only inside webhook handler
 
 ### Bunny.net Stream — signed URLs
 - All video playback URLs must be signed (short-lived expiry)
@@ -229,8 +234,8 @@ npm run dev   # http://localhost:3000
 | `COOKIE_SECURE` | `false` | `true` |
 | `COOKIE_DOMAIN` | `localhost` | `.edemaukabi.dev` |
 | `CORS_ORIGIN` | `http://localhost:3000` | `https://learnbuild.edemaukabi.dev` |
-| `STRIPE_SECRET_KEY` | `sk_test_...` | `sk_live_...` |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | production secret |
+| `PAYSTACK_SECRET_KEY` | `sk_test_...` | `sk_live_...` |
+| `PAYSTACK_WEBHOOK_SECRET` | Paystack webhook secret | production secret |
 | `BUNNY_API_KEY` | Bunny API key | same |
 | `BUNNY_LIBRARY_ID` | Bunny video library ID | same |
 | `BUNNY_CDN_HOSTNAME` | `vz-xxx.b-cdn.net` | same |
@@ -254,7 +259,7 @@ npm run dev   # http://localhost:3000
 
 ## Known Issues / Gotchas
 
-- **Stripe webhook raw body**: The webhook route must receive the raw (unparsed) body for signature verification. In NestJS, use `app.use('/api/v1/stripe/webhook', rawBodyMiddleware)` before `app.useGlobalPipes()`.
+- **Paystack webhook raw body**: Use `NestFactory.create(AppModule, { rawBody: true })` in `main.ts`. Access raw body via `@RawBody()` decorator in the webhook controller. Verify with HMAC-SHA512 against `x-paystack-signature` header.
 - **Bunny signed URLs**: Generate on the backend, never expose the signing key. Signed URLs expire — keep expiry > video segment length.
 - **Docker volume prefix**: All volumes must start with `learnbuild-`. Never use `down -v`.
 - **BullMQ + Redis**: Queues must be drained gracefully on shutdown — use `app.enableShutdownHooks()`.
