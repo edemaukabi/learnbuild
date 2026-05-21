@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -31,6 +32,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private mail: MailService,
   ) {}
 
   async register(dto: RegisterDto): Promise<{ user: UserResponse; tokens: Tokens }> {
@@ -50,6 +52,7 @@ export class AuthService {
     });
 
     const tokens = await this.generateTokens(user);
+    this.mail.sendWelcome({ firstName: user.firstName, email: user.email });
     return { user: this.toResponse(user), tokens };
   }
 

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Star, Users, Clock, BookOpen, Globe, ChevronDown, Play, Lock, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import EnrollButton from '@/components/course/EnrollButton';
+import ReviewSection from '@/components/course/ReviewSection';
 import { CourseDetail, Section } from '@/types';
 import { formatPrice, formatDuration, formatRating } from '@/lib/utils';
 
@@ -210,7 +211,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
           {/* Instructor bio */}
           {course.instructor.bio && (
-            <section>
+            <section className="mb-8">
               <h2 className="text-lg font-semibold text-[var(--fg)] mb-4">Your instructor</h2>
               <div className="flex items-start gap-4">
                 {course.instructor.avatar ? (
@@ -238,6 +239,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               </div>
             </section>
           )}
+
+          {/* Reviews */}
+          <ReviewSection
+            courseId={course.id}
+            averageRating={course.averageRating}
+            totalReviews={course.totalReviews}
+          />
         </div>
 
         {/* Sticky sidebar */}

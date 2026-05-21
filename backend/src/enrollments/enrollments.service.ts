@@ -10,6 +10,7 @@ import { CourseStatus, PaymentStatus } from '@prisma/client';
 import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentService } from '../payments/payment.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class EnrollmentsService {
@@ -19,6 +20,7 @@ export class EnrollmentsService {
     private prisma: PrismaService,
     private paymentService: PaymentService,
     private config: ConfigService,
+    private mail: MailService,
   ) {}
 
   async isEnrolled(userId: string, courseId: string): Promise<boolean> {
@@ -49,6 +51,9 @@ export class EnrollmentsService {
         data: { totalStudents: { increment: 1 } },
       }),
     ]);
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { firstName: true, email: true } });
+    if (user) this.mail.sendEnrollmentConfirmation(user, { title: course.title, slug: course.slug });
 
     return enrollment;
   }
@@ -113,5 +118,11 @@ export class EnrollmentsService {
     ]);
 
     this.logger.log(`Enrollment created via webhook: userId=${userId} courseId=${courseId}`);
+
+    const [user, course] = await Promise.all([
+      this.prisma.user.findUnique({ where: { id: userId }, select: { firstName: true, email: true } }),
+      this.prisma.course.findUnique({ where: { id: courseId }, select: { title: true, slug: true } }),
+    ]);
+    if (user && course) this.mail.sendEnrollmentConfirmation(user, course);
   }
 }

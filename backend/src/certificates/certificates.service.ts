@@ -9,12 +9,14 @@ import * as crypto from 'crypto';
 import * as PDFDocument from 'pdfkit';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class CertificatesService {
   constructor(
     private prisma: PrismaService,
     private storage: StorageService,
+    private mail: MailService,
   ) {}
 
   async generate(userId: string, courseId: string) {
@@ -56,7 +58,7 @@ export class CertificatesService {
 
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
-      select: { firstName: true, lastName: true },
+      select: { firstName: true, lastName: true, email: true },
     });
 
     const certificateNumber = `LB-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
@@ -75,9 +77,19 @@ export class CertificatesService {
     await this.storage.upload(r2Key, pdfBuffer, 'application/pdf');
 
     // Persist record
-    return this.prisma.certificate.create({
+    const certificate = await this.prisma.certificate.create({
       data: { userId, courseId, pdfUrl: r2Key, certificateNumber, issuedAt },
     });
+
+    // Send email — download URL valid 24h so the link doesn't expire immediately in their inbox
+    const downloadUrl = await this.storage.getSignedDownloadUrl(r2Key, 86400);
+    this.mail.sendCertificateIssued(
+      { firstName: user.firstName, email: user.email },
+      { title: course.title },
+      downloadUrl,
+    );
+
+    return certificate;
   }
 
   async listForUser(userId: string) {
