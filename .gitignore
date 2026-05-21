@@ -1,0 +1,49 @@
+# Node / NestJS
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+.envs/
+
+# Python (in case any scripts)
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+env/
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+*.log
+logs/
+
+# Prisma
+prisma/migrations/*.sql.bak
+
+# Upload temp
+uploads/
+tmp/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# PM2
+ecosystem.config.js.bak
