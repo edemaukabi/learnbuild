@@ -20,6 +20,7 @@ import { CertificatesModule } from './certificates/certificates.module';
 import { InstructorModule } from './instructor/instructor.module';
 import { MailModule } from './mail/mail.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     InstructorModule,
     MailModule,
     ReviewsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
