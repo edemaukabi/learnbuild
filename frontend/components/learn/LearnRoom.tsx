@@ -17,6 +17,8 @@ import {
   HelpCircle,
   Trash2,
   Plus,
+  Award,
+  Loader2,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
@@ -71,6 +73,8 @@ export default function LearnRoom({ slug }: { slug: string }) {
   const [notesOpen, setNotesOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [generatingCert, setGeneratingCert] = useState(false);
+  const [certIssued, setCertIssued] = useState(false);
 
   // Load course + curriculum + progress
   useEffect(() => {
@@ -141,6 +145,20 @@ export default function LearnRoom({ slug }: { slug: string }) {
 
   const allLessons = sections.flatMap((s) => s.lessons);
   const completedCount = allLessons.filter((l) => completedIds.has(l.id)).length;
+  const courseComplete = allLessons.length > 0 && completedCount === allLessons.length;
+
+  const handleGetCertificate = async () => {
+    if (!course) return;
+    setGeneratingCert(true);
+    try {
+      await api.post(`/certificates/generate/${course.id}`);
+      setCertIssued(true);
+    } catch {
+      setCertIssued(true); // already issued — still show success
+    } finally {
+      setGeneratingCert(false);
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col bg-[var(--bg)] overflow-hidden">
@@ -183,6 +201,29 @@ export default function LearnRoom({ slug }: { slug: string }) {
           </button>
         </div>
       </header>
+
+      {/* Completion banner */}
+      {courseComplete && (
+        <div className="shrink-0 flex items-center justify-between gap-4 px-4 py-2.5 bg-[var(--teal-soft)] border-b border-[var(--teal-edge)]">
+          <div className="flex items-center gap-2 text-sm text-[var(--teal)]">
+            <Award size={16} />
+            <span className="font-medium">Course complete!</span>
+            <span className="text-[var(--fg-3)] text-xs hidden sm:inline">You&apos;ve finished all lessons.</span>
+          </div>
+          {certIssued ? (
+            <Link href="/dashboard">
+              <Button size="sm" variant="secondary" className="gap-1.5 text-xs">
+                <Award size={12} /> View certificate
+              </Button>
+            </Link>
+          ) : (
+            <Button size="sm" className="gap-1.5 text-xs" onClick={handleGetCertificate} disabled={generatingCert}>
+              {generatingCert ? <Loader2 size={12} className="animate-spin" /> : <Award size={12} />}
+              {generatingCert ? 'Generating…' : 'Get certificate'}
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">

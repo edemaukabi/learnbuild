@@ -15,6 +15,8 @@ import { UsersModule } from './users/users.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { ProgressModule } from './progress/progress.module';
 import { NotesModule } from './notes/notes.module';
+import { StorageModule } from './storage/storage.module';
+import { CertificatesModule } from './certificates/certificates.module';
 
 @Module({
   imports: [
@@ -49,6 +51,8 @@ import { NotesModule } from './notes/notes.module';
     EnrollmentsModule,
     ProgressModule,
     NotesModule,
+    StorageModule,
+    CertificatesModule,
   ],
 })
 export class AppModule {}
