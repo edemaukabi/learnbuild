@@ -13,6 +13,8 @@ import { SectionsModule } from './sections/sections.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { UsersModule } from './users/users.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
+import { ProgressModule } from './progress/progress.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { EnrollmentsModule } from './enrollments/enrollments.module';
     LessonsModule,
     UsersModule,
     EnrollmentsModule,
+    ProgressModule,
+    NotesModule,
   ],
 })
 export class AppModule {}
