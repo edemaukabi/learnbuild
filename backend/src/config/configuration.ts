@@ -19,6 +19,14 @@ export default () => ({
     libraryId: process.env.BUNNY_LIBRARY_ID,
     cdnHostname: process.env.BUNNY_CDN_HOSTNAME,
   },
+  storage: {
+    provider: process.env.STORAGE_PROVIDER ?? 'cloudinary', // 'cloudinary' | 'r2'
+  },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
   r2: {
     accountId: process.env.R2_ACCOUNT_ID,
     accessKeyId: process.env.R2_ACCESS_KEY_ID,
