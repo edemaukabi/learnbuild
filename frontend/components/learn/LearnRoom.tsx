@@ -370,25 +370,43 @@ function LessonViewer({
   onNext: () => void;
   hasNext: boolean;
 }) {
-  const bunnyLibraryId = process.env.NEXT_PUBLIC_BUNNY_LIBRARY_ID;
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
+
+  useEffect(() => {
+    if (lesson.type !== 'VIDEO' || !lesson.videoId) { setVideoUrl(null); return; }
+    setVideoLoading(true);
+    setVideoUrl(null);
+    api.get<{ url: string }>(`/lessons/${lesson.id}/video-url`)
+      .then((r) => setVideoUrl(r.data.url))
+      .catch(() => setVideoUrl(null))
+      .finally(() => setVideoLoading(false));
+  }, [lesson.id, lesson.type, lesson.videoId]);
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       {/* Video */}
-      {lesson.type === 'VIDEO' && lesson.videoId && bunnyLibraryId && (
+      {lesson.type === 'VIDEO' && (
         <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden mb-6">
-          <iframe
-            src={`https://iframe.mediadelivery.net/embed/${bunnyLibraryId}/${lesson.videoId}?autoplay=false&responsive=true`}
-            className="absolute inset-0 w-full h-full"
-            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      )}
-
-      {lesson.type === 'VIDEO' && !lesson.videoId && (
-        <div className="w-full aspect-video bg-[var(--card-2)] rounded-xl flex items-center justify-center mb-6">
-          <p className="text-sm text-[var(--fg-4)]">Video not available yet</p>
+          {videoLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 size={28} className="text-[var(--fg-4)] animate-spin" />
+            </div>
+          )}
+          {videoUrl && (
+            <video
+              key={videoUrl}
+              src={videoUrl}
+              controls
+              className="absolute inset-0 w-full h-full"
+              controlsList="nodownload"
+            />
+          )}
+          {!videoLoading && !videoUrl && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-sm text-[var(--fg-4)]">Video not available yet</p>
+            </div>
+          )}
         </div>
       )}
 

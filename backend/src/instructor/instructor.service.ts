@@ -1,65 +1,29 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios, { AxiosError } from 'axios';
+import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class InstructorService {
   private readonly logger = new Logger(InstructorService.name);
-  private readonly bunnyApiBase = 'https://video.bunnycdn.com';
 
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
+    private storage: StorageService,
   ) {}
 
   async createAndUploadVideo(
-    title: string,
+    _title: string,
     fileBuffer: Buffer,
     mimeType: string,
   ): Promise<{ videoId: string }> {
-    const libraryId = this.config.get<string>('bunny.libraryId');
-    const apiKey = this.config.get<string>('bunny.apiKey');
-
-    if (!libraryId || !apiKey) {
-      throw new InternalServerErrorException('Bunny.net not configured');
-    }
-
-    // Step 1: Create the video object
-    let videoId: string;
-    try {
-      const { data } = await axios.post(
-        `${this.bunnyApiBase}/library/${libraryId}/videos`,
-        { title },
-        { headers: { AccessKey: apiKey, 'Content-Type': 'application/json' } },
-      );
-      videoId = data.guid;
-    } catch (err) {
-      this.logger.error('Bunny create video failed', (err as AxiosError).message);
-      throw new InternalServerErrorException('Failed to create video');
-    }
-
-    // Step 2: Upload the file
-    try {
-      await axios.put(
-        `${this.bunnyApiBase}/library/${libraryId}/videos/${videoId}`,
-        fileBuffer,
-        {
-          headers: {
-            AccessKey: apiKey,
-            'Content-Type': mimeType,
-          },
-          maxBodyLength: Infinity,
-          maxContentLength: Infinity,
-        },
-      );
-    } catch (err) {
-      this.logger.error('Bunny upload video failed', (err as AxiosError).message);
-      throw new InternalServerErrorException('Failed to upload video');
-    }
-
-    this.logger.log(`Video uploaded to Bunny: ${videoId}`);
-    return { videoId };
+    const ext = mimeType.split('/')[1] ?? 'mp4';
+    const key = `videos/${crypto.randomUUID()}.${ext}`;
+    await this.storage.upload(key, fileBuffer, mimeType);
+    this.logger.log(`Video uploaded to R2: ${key}`);
+    return { videoId: key };
   }
 
   async getStats(instructorId: string) {
