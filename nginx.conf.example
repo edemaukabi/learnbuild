@@ -1,22 +1,15 @@
-# /etc/nginx/sites-available/learnbuild-api
-# Symlink: sudo ln -s /etc/nginx/sites-available/learnbuild-api /etc/nginx/sites-enabled/
+# /etc/nginx/sites-available/your-app-api
+# Replace YOUR_DOMAIN with your actual domain (e.g. myapp-api.example.com)
+# Symlink: sudo ln -s /etc/nginx/sites-available/your-app-api /etc/nginx/sites-enabled/
+
+# Step 1: deploy this HTTP-only block first, reload nginx, then run certbot.
+# Certbot will add the SSL server block automatically.
 
 server {
     listen 80;
-    server_name learnbuild-api.edemaukabi.dev;
-    return 301 https://$host$request_uri;
-}
+    server_name YOUR_DOMAIN;
 
-server {
-    listen 443 ssl;
-    server_name learnbuild-api.edemaukabi.dev;
-
-    ssl_certificate     /etc/letsencrypt/live/learnbuild-api.edemaukabi.dev/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/learnbuild-api.edemaukabi.dev/privkey.pem;
-    include             /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
-
-    client_max_body_size 2G;   # for video uploads
+    client_max_body_size 2G;
 
     location / {
         proxy_pass         http://localhost:8005;
@@ -28,6 +21,33 @@ server {
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
-        proxy_read_timeout 300s;   # for video uploads
+        proxy_read_timeout 300s;
     }
 }
+
+# Step 2: after certbot runs, it will add a server block like this automatically:
+#
+# server {
+#     listen 443 ssl;
+#     server_name YOUR_DOMAIN;
+#
+#     ssl_certificate     /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+#     include             /etc/letsencrypt/options-ssl-nginx.conf;
+#     ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+#
+#     client_max_body_size 2G;
+#
+#     location / {
+#         proxy_pass         http://localhost:8005;
+#         proxy_http_version 1.1;
+#         proxy_set_header   Upgrade $http_upgrade;
+#         proxy_set_header   Connection 'upgrade';
+#         proxy_set_header   Host $host;
+#         proxy_set_header   X-Real-IP $remote_addr;
+#         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header   X-Forwarded-Proto $scheme;
+#         proxy_cache_bypass $http_upgrade;
+#         proxy_read_timeout 300s;
+#     }
+# }

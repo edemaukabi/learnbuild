@@ -1,5 +1,5 @@
 import { PrismaClient, Role } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -23,21 +23,25 @@ async function main() {
     });
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL ?? 'edemaukabi@gmail.com';
-  const adminPassword = process.env.ADMIN_PASSWORD ?? 'changeme123!';
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
 
-  await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      password: await bcrypt.hash(adminPassword, 12),
-      firstName: 'Edema',
-      lastName: 'Ukabi',
-      role: Role.ADMIN,
-      isEmailVerified: true,
-    },
-  });
+  if (!adminEmail || !adminPassword) {
+    console.warn('Skipping admin seed: ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env');
+  } else {
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: {
+        email: adminEmail,
+        password: await bcrypt.hash(adminPassword, 12),
+        firstName: 'Admin',
+        lastName: 'User',
+        role: Role.ADMIN,
+        isEmailVerified: true,
+      },
+    });
+  }
 
   console.log('Seed complete');
 }
