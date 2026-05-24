@@ -48,3 +48,6 @@ coverage/
 
 # PM2
 ecosystem.config.js.bak
+
+# Claude Code
+.claude/
