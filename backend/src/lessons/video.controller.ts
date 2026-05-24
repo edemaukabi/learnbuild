@@ -11,7 +11,9 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Lessons')
 @Controller('lessons')
 export class VideoController {
   constructor(

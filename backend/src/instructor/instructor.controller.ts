@@ -15,11 +15,13 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { InstructorService } from './instructor.service';
+import { ApiTags } from '@nestjs/swagger';
 
 const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.INSTRUCTOR, Role.ADMIN)
+@ApiTags('Instructor')
 @Controller('instructor')
 export class InstructorController {
   constructor(private readonly instructor: InstructorService) {}

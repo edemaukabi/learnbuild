@@ -11,6 +11,7 @@ import {
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import { ApiTags, ApiOperation, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -18,6 +19,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,6 +27,7 @@ export class AuthController {
     private config: ConfigService,
   ) {}
 
+  @ApiOperation({ summary: 'Register a new account' })
   @Post('register')
   async register(
     @Body() dto: RegisterDto,
@@ -35,6 +38,7 @@ export class AuthController {
     return { user };
   }
 
+  @ApiOperation({ summary: 'Login' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -46,7 +50,8 @@ export class AuthController {
     return { user };
   }
 
-  // Uses the refresh cookie — rotates the refresh token and issues new pair
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'Refresh tokens using refresh cookie' })
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
@@ -59,7 +64,8 @@ export class AuthController {
     return { message: 'Tokens refreshed' };
   }
 
-  // Uses the access cookie — revokes all active refresh tokens for this user
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'Logout — clears cookies and revokes tokens' })
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
@@ -72,6 +78,8 @@ export class AuthController {
     return { message: 'Logged out' };
   }
 
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'Get current user' })
   @UseGuards(JwtAuthGuard)
   @Get('me')
   me(@CurrentUser() user: User) {

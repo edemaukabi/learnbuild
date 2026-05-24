@@ -18,7 +18,9 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Lessons')
 @Controller('sections/:sectionId/lessons')
 export class LessonsController {
   constructor(private lessonsService: LessonsService) {}

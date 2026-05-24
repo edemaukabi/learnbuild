@@ -1,4 +1,4 @@
-version: "3.9"
+name: learnbuild
 
 services:
   api:
@@ -6,21 +6,27 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
+    container_name: learnbuild-api
     ports:
       - "8005:8005"
     env_file:
       - .env
     environment:
       NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@learnbuild-postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://learnbuild-redis:6379
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    networks:
+      - learnbuild-network
     restart: unless-stopped
 
   postgres:
     image: postgres:15-alpine
+    container_name: learnbuild-postgres
     volumes:
       - learnbuild-postgres-data:/var/lib/postgresql/data
     env_file:
@@ -34,10 +40,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - learnbuild-network
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    container_name: learnbuild-redis
     volumes:
       - learnbuild-redis-data:/data
     healthcheck:
@@ -45,6 +54,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - learnbuild-network
     restart: unless-stopped
 
 volumes:
@@ -52,3 +63,7 @@ volumes:
     name: learnbuild-postgres-data
   learnbuild-redis-data:
     name: learnbuild-redis-data
+
+networks:
+  learnbuild-network:
+    name: learnbuild-network

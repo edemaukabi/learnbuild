@@ -17,7 +17,9 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 import { EnrollmentsService } from './enrollments.service';
 import { PaymentService } from '../payments/payment.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Enrollments')
 @Controller('enrollments')
 export class EnrollmentsController {
   private readonly logger = new Logger(EnrollmentsController.name);

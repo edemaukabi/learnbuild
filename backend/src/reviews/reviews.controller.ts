@@ -13,7 +13,9 @@ import { ReviewsService } from './reviews.service';
 import { UpsertReviewDto } from './dto/review.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Reviews')
 @Controller('reviews')
 export class ReviewsController {
   constructor(private reviews: ReviewsService) {}

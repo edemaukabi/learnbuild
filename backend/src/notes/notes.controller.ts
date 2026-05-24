@@ -15,8 +15,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { NotesService } from './notes.service';
 import { CreateNoteDto, UpdateNoteDto } from './dto/note.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('Notes')
 @Controller('notes')
 export class NotesController {
   constructor(private readonly notes: NotesService) {}
