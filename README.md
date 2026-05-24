@@ -47,7 +47,7 @@ A full-stack e-learning platform where instructors create and sell courses, and 
 | Styling | Tailwind CSS · shadcn/ui |
 | Drag-and-drop | @dnd-kit/sortable |
 | Frontend hosting | Vercel |
-| Backend hosting | Contabo VPS |
+| Backend hosting | VPS (Docker + Nginx) |
 
 ---
 
@@ -176,7 +176,7 @@ All routes are prefixed `/api/v1`. Full interactive docs at `/api/v1/docs` in de
 
 ## Deployment
 
-**Backend** — Contabo VPS with Docker Compose + Nginx  
+**Backend** — VPS with Docker Compose + Nginx  
 **Frontend** — Vercel
 
 ```bash
