@@ -1,5 +1,6 @@
 import LearnRoom from '@/components/learn/LearnRoom';
 
-export default function LearnPage({ params }: { params: { slug: string } }) {
-  return <LearnRoom slug={params.slug} />;
+export default async function LearnPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <LearnRoom slug={slug} />;
 }
