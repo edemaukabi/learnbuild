@@ -98,22 +98,31 @@ export class AuthController {
     tokens: { accessToken: string; refreshToken: string },
   ) {
     const isProd = this.config.get<string>('nodeEnv') === 'production';
+    const domain = isProd
+      ? this.config.get<string>('cookieDomain') ?? undefined
+      : undefined;
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: 'lax',
+      domain,
       maxAge: 15 * 60 * 1000,
     });
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: 'lax',
+      domain,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
 
   private clearTokenCookies(res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    const isProd = this.config.get<string>('nodeEnv') === 'production';
+    const domain = isProd
+      ? this.config.get<string>('cookieDomain') ?? undefined
+      : undefined;
+    res.clearCookie('access_token', { domain });
+    res.clearCookie('refresh_token', { domain });
   }
 }

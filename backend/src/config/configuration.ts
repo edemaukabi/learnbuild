@@ -10,6 +10,7 @@ export default () => ({
   cors: {
     origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
   },
+  cookieDomain: process.env.COOKIE_DOMAIN,
   paystack: {
     secretKey: process.env.PAYSTACK_SECRET_KEY,
     webhookSecret: process.env.PAYSTACK_WEBHOOK_SECRET,
