@@ -51,7 +51,7 @@ async function getCourses(params: SearchParams): Promise<PaginatedResponse<Cours
 }
 
 export const metadata = {
-  title: 'Course Catalog — LearnBuild',
+  title: 'Course Catalog | LearnBuild',
   description: 'Browse expert-led courses in development, design, data, and more.',
 };
 

@@ -47,9 +47,9 @@ async function getCurriculum(slug: string): Promise<Section[]> {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const course = await getCourse(slug);
-  if (!course) return { title: 'Course Not Found — LearnBuild' };
+  if (!course) return { title: 'Course Not Found | LearnBuild' };
   return {
-    title: `${course.title} — LearnBuild`,
+    title: `${course.title} | LearnBuild`,
     description: course.shortDescription,
   };
 }

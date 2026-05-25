@@ -4,7 +4,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'LearnBuild — Learn & Build Skills',
+  title: 'LearnBuild | Learn & Build Skills',
   description: 'A modern e-learning platform for instructors and students.',
 };
 
