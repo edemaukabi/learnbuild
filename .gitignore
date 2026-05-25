@@ -5,6 +5,7 @@ build/
 .next/
 out/
 *.tsbuildinfo
+frontend/next-env.d.ts
 
 # Environment
 .env
