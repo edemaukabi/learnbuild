@@ -17,6 +17,9 @@ export default function Footer() {
           <Link href="/catalog" className="hover:text-[var(--fg)] transition-colors">
             Catalog
           </Link>
+          <Link href="/docs" className="hover:text-[var(--fg)] transition-colors">
+            Docs
+          </Link>
           <Link href="/auth/login" className="hover:text-[var(--fg)] transition-colors">
             Sign in
           </Link>

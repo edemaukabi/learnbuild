@@ -50,6 +50,12 @@ export default function Nav() {
               Teach
             </Link>
           )}
+          <Link
+            href="/docs"
+            className="px-3 py-1.5 rounded-md text-sm text-[var(--fg-2)] hover:text-[var(--fg)] hover:bg-[var(--card-2)] transition-all duration-[var(--t)]"
+          >
+            Docs
+          </Link>
         </nav>
 
         {/* Actions */}
@@ -114,6 +120,9 @@ export default function Nav() {
               Teach
             </Link>
           )}
+          <Link href="/docs" className="py-2 text-sm text-[var(--fg-2)]" onClick={() => setMenuOpen(false)}>
+            Docs
+          </Link>
           <div className="border-t border-[var(--border)] mt-2 pt-2 flex flex-col gap-2">
             {user ? (
               <>
