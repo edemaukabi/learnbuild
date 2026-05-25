@@ -126,7 +126,6 @@ const GROUPS: DocGroup[] = [
               <li><strong>Catalog</strong> — the public course catalog with search and filters.</li>
               <li><strong>Teach</strong> — visible to Instructors only; links to the instructor dashboard.</li>
               <li><strong>Theme toggle</strong> — switches between dark and light mode. Your preference is saved across sessions.</li>
-              <li><strong>Admin</strong> — visible to Admins only; links to the admin panel.</li>
               <li><strong>My Learning</strong> — your student dashboard with enrolled courses and certificates.</li>
               <li><strong>Sign in / Get started</strong> — shown when you are not logged in.</li>
             </ul>
@@ -140,8 +139,7 @@ const GROUPS: DocGroup[] = [
               <li><code>/catalog/[slug]</code> — Course detail page with curriculum, instructor bio, and enroll button.</li>
               <li><code>/dashboard</code> — Your personal learning dashboard (requires login).</li>
               <li><code>/learn/[slug]</code> — The in-course learning interface (requires enrollment).</li>
-              <li><code>/instructor</code> — Instructor dashboard (Instructor/Admin only).</li>
-              <li><code>/admin</code> — Admin panel (Admin only).</li>
+              <li><code>/instructor</code> — Instructor dashboard (Instructor only).</li>
               <li><code>/docs</code> — This documentation page.</li>
             </ul>
           </>
@@ -183,14 +181,6 @@ const GROUPS: DocGroup[] = [
             <Callout type="info">
               The Instructor role is not self-serve. Contact a platform admin to have your account upgraded.
             </Callout>
-            <h4>Admin</h4>
-            <ul>
-              <li>Everything an Instructor can do.</li>
-              <li>Manage all users and change their roles.</li>
-              <li>Manage all courses platform-wide (view, toggle publish, delete).</li>
-              <li>Manage course categories.</li>
-              <li>Access the admin panel at <code>/admin</code>.</li>
-            </ul>
           </>
         ),
       },
