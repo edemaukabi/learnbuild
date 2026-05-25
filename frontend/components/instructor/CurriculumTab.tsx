@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import api from '@/lib/api';
 
 interface LessonItem {
@@ -62,6 +63,8 @@ export default function CurriculumTab({ courseId }: { courseId: string }) {
   const [addingSection, setAddingSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [pendingDeleteSection, setPendingDeleteSection] = useState<SectionItem | null>(null);
+  const [pendingDeleteLesson, setPendingDeleteLesson] = useState<{ sectionId: string; lesson: LessonItem } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -99,10 +102,11 @@ export default function CurriculumTab({ courseId }: { courseId: string }) {
     setAddingSection(false);
   };
 
-  const deleteSection = async (sectionId: string) => {
-    if (!confirm('Delete this section and all its lessons?')) return;
-    await api.delete(`/courses/${courseId}/sections/${sectionId}`);
-    setSections((prev) => prev.filter((s) => s.id !== sectionId));
+  const confirmDeleteSection = async () => {
+    if (!pendingDeleteSection) return;
+    await api.delete(`/courses/${courseId}/sections/${pendingDeleteSection.id}`);
+    setSections((prev) => prev.filter((s) => s.id !== pendingDeleteSection.id));
+    setPendingDeleteSection(null);
   };
 
   const updateSectionTitle = async (sectionId: string, title: string) => {
@@ -130,13 +134,16 @@ export default function CurriculumTab({ courseId }: { courseId: string }) {
     );
   };
 
-  const deleteLesson = async (sectionId: string, lessonId: string) => {
-    await api.delete(`/sections/${sectionId}/lessons/${lessonId}`);
+  const confirmDeleteLesson = async () => {
+    if (!pendingDeleteLesson) return;
+    const { sectionId, lesson } = pendingDeleteLesson;
+    await api.delete(`/sections/${sectionId}/lessons/${lesson.id}`);
     setSections((prev) =>
       prev.map((s) =>
-        s.id === sectionId ? { ...s, lessons: s.lessons.filter((l) => l.id !== lessonId) } : s,
+        s.id === sectionId ? { ...s, lessons: s.lessons.filter((l) => l.id !== lesson.id) } : s,
       ),
     );
+    setPendingDeleteLesson(null);
   };
 
   if (loading) return <p className="text-sm text-[var(--fg-3)]">Loading curriculum…</p>;
@@ -159,10 +166,10 @@ export default function CurriculumTab({ courseId }: { courseId: string }) {
                 })
               }
               onTitleChange={(title) => updateSectionTitle(section.id, title)}
-              onDelete={() => deleteSection(section.id)}
+              onDelete={() => setPendingDeleteSection(section)}
               onAddLesson={() => addLesson(section.id)}
               onUpdateLesson={(lesson) => updateLesson(section.id, lesson)}
-              onDeleteLesson={(lessonId) => deleteLesson(section.id, lessonId)}
+              onDeleteLesson={(lesson) => setPendingDeleteLesson({ sectionId: section.id, lesson })}
               courseId={courseId}
             />
           ))}
@@ -170,6 +177,25 @@ export default function CurriculumTab({ courseId }: { courseId: string }) {
       </DndContext>
 
       {/* Add section */}
+      <ConfirmModal
+        open={pendingDeleteSection !== null}
+        title="Delete section"
+        description={pendingDeleteSection ? `Are you sure you want to delete "${pendingDeleteSection.title}"?` : ''}
+        details={pendingDeleteSection ? `This will permanently delete the section and all ${pendingDeleteSection.lessons.length} lesson${pendingDeleteSection.lessons.length !== 1 ? 's' : ''} inside it.` : ''}
+        confirmLabel="Delete section"
+        onConfirm={confirmDeleteSection}
+        onCancel={() => setPendingDeleteSection(null)}
+      />
+      <ConfirmModal
+        open={pendingDeleteLesson !== null}
+        title="Delete lesson"
+        description={pendingDeleteLesson ? `Are you sure you want to delete "${pendingDeleteLesson.lesson.title}"?` : ''}
+        details="This lesson and all its content will be permanently removed."
+        confirmLabel="Delete lesson"
+        onConfirm={confirmDeleteLesson}
+        onCancel={() => setPendingDeleteLesson(null)}
+      />
+
       {addingSection ? (
         <div className="flex gap-2">
           <Input
@@ -212,7 +238,7 @@ function SortableSection({
   onDelete: () => void;
   onAddLesson: () => void;
   onUpdateLesson: (lesson: LessonItem) => void;
-  onDeleteLesson: (id: string) => void;
+  onDeleteLesson: (lesson: LessonItem) => void;
   courseId: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
@@ -287,7 +313,7 @@ function SortableSection({
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--teal-soft)] text-[var(--teal)]">Preview</span>
                   )}
                   <button
-                    onClick={(e) => { e.stopPropagation(); onDeleteLesson(lesson.id); }}
+                    onClick={(e) => { e.stopPropagation(); onDeleteLesson(lesson); }}
                     className="text-[var(--fg-4)] hover:text-[var(--rose)] transition-colors"
                   >
                     <Trash2 size={12} />

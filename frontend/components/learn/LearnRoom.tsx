@@ -23,6 +23,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import { formatDuration } from '@/lib/utils';
 
 // --- Types ---
@@ -482,6 +483,7 @@ function NotesPanel({ lessonId }: { lessonId: string }) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
+  const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -505,9 +507,11 @@ function NotesPanel({ lessonId }: { lessonId: string }) {
     }
   };
 
-  const remove = async (noteId: string) => {
-    await api.delete(`/notes/${noteId}`);
-    setNotes((prev) => prev.filter((n) => n.id !== noteId));
+  const confirmDeleteNote = async () => {
+    if (!pendingDeleteNoteId) return;
+    await api.delete(`/notes/${pendingDeleteNoteId}`);
+    setNotes((prev) => prev.filter((n) => n.id !== pendingDeleteNoteId));
+    setPendingDeleteNoteId(null);
   };
 
   return (
@@ -537,7 +541,7 @@ function NotesPanel({ lessonId }: { lessonId: string }) {
                   {new Date(note.createdAt).toLocaleDateString()}
                 </span>
                 <button
-                  onClick={() => remove(note.id)}
+                  onClick={() => setPendingDeleteNoteId(note.id)}
                   className="opacity-0 group-hover:opacity-100 text-[var(--fg-4)] hover:text-[var(--rose)] transition-all"
                 >
                   <Trash2 size={12} />
@@ -566,6 +570,16 @@ function NotesPanel({ lessonId }: { lessonId: string }) {
           <Plus size={12} /> {saving ? 'Saving…' : 'Add note'}
         </button>
       </div>
+
+      <ConfirmModal
+        open={pendingDeleteNoteId !== null}
+        title="Delete note"
+        description="Are you sure you want to delete this note?"
+        details="This note will be permanently removed and cannot be recovered."
+        confirmLabel="Delete note"
+        onConfirm={confirmDeleteNote}
+        onCancel={() => setPendingDeleteNoteId(null)}
+      />
     </div>
   );
 }

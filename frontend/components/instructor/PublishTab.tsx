@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Globe, Archive, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import api from '@/lib/api';
 
 interface CourseBasic {
@@ -20,6 +21,7 @@ export default function PublishTab({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
 
   const handlePublish = async () => {
     setLoading(true);
@@ -35,7 +37,7 @@ export default function PublishTab({
     }
   };
 
-  const handleArchive = async () => {
+  const handleArchiveConfirm = async () => {
     setLoading(true);
     setError('');
     try {
@@ -46,6 +48,7 @@ export default function PublishTab({
       setError(typeof msg === 'string' ? msg : 'Failed to archive course');
     } finally {
       setLoading(false);
+      setArchiveConfirmOpen(false);
     }
   };
 
@@ -147,13 +150,13 @@ export default function PublishTab({
           </div>
 
           <Button
-            onClick={handleArchive}
+            onClick={() => setArchiveConfirmOpen(true)}
             disabled={loading}
             variant="outline"
             className="flex items-center gap-2 border-[var(--border-2)] text-[var(--fg-3)] hover:text-[var(--fg)]"
           >
             <Archive size={14} />
-            {loading ? 'Archiving…' : 'Archive course'}
+            Archive course
           </Button>
         </div>
       )}
@@ -163,6 +166,16 @@ export default function PublishTab({
           {error}
         </p>
       )}
+
+      <ConfirmModal
+        open={archiveConfirmOpen}
+        title="Archive course"
+        description={`Are you sure you want to archive "${course.title}"?`}
+        details="The course will be removed from the catalog and no new enrollments will be allowed. Students already enrolled keep their access. You can reverse this by publishing the course again."
+        confirmLabel="Archive course"
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setArchiveConfirmOpen(false)}
+      />
     </div>
   );
 }
