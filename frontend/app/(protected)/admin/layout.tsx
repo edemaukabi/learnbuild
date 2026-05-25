@@ -27,10 +27,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading || !user || user.role !== 'ADMIN') return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
+      {/* Mobile tab nav */}
+      <nav className="flex md:hidden gap-1 overflow-x-auto pb-4 mb-6 border-b border-[var(--border)] -mx-4 px-4 scrollbar-none">
+        {NAV.map(({ href, label, icon: Icon }) => {
+          const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-colors ${
+                active
+                  ? 'bg-[var(--sky-soft)] text-[var(--sky)]'
+                  : 'text-[var(--fg-3)] hover:text-[var(--fg)] hover:bg-[var(--card)]'
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+
       <div className="flex gap-8">
-        {/* Sidebar */}
-        <aside className="w-48 shrink-0">
+        {/* Desktop sidebar */}
+        <aside className="hidden md:block w-48 shrink-0">
           <p className="text-xs font-semibold text-[var(--fg-4)] uppercase tracking-wider mb-3 px-3">Admin</p>
           <nav className="space-y-0.5">
             {NAV.map(({ href, label, icon: Icon }) => {

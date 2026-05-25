@@ -43,7 +43,7 @@ export class MailService {
           style="display:inline-block;margin-top:20px;padding:10px 22px;background:#0EA5E9;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
           Browse courses
         </a>
-        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · edemaukabi.dev</p>
+        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · learnbuild.edemaukabi.dev</p>
       </div>`,
     );
   }
@@ -66,7 +66,28 @@ export class MailService {
           style="display:inline-block;margin-top:20px;padding:10px 22px;background:#0EA5E9;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
           Start learning
         </a>
-        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · edemaukabi.dev</p>
+        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · learnbuild.edemaukabi.dev</p>
+      </div>`,
+    );
+  }
+
+  sendPasswordReset(user: { firstName: string; email: string }, resetUrl: string) {
+    this.send(
+      user.email,
+      'Reset your LearnBuild password',
+      `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#0F1923;color:#F0F6FF;border-radius:12px">
+        <h1 style="font-size:22px;margin:0 0 12px">Hi ${user.firstName}, reset your password</h1>
+        <p style="color:#94A3B8;line-height:1.6">
+          Someone requested a password reset for your LearnBuild account. Click the button below — this link expires in <strong style="color:#F0F6FF">1 hour</strong>.
+        </p>
+        <a href="${resetUrl}"
+          style="display:inline-block;margin-top:20px;padding:10px 22px;background:#0EA5E9;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
+          Reset password
+        </a>
+        <p style="margin-top:20px;font-size:13px;color:#64748B">
+          If you didn't request this, you can safely ignore this email. Your password won't change.
+        </p>
+        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · learnbuild.edemaukabi.dev</p>
       </div>`,
     );
   }
@@ -89,7 +110,7 @@ export class MailService {
           style="display:inline-block;margin-top:20px;padding:10px 22px;background:#0D9488;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
           Download certificate
         </a>
-        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · edemaukabi.dev</p>
+        <p style="margin-top:24px;font-size:13px;color:#64748B">LearnBuild · learnbuild.edemaukabi.dev</p>
       </div>`,
     );
   }

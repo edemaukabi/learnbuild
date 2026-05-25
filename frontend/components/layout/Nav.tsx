@@ -2,17 +2,25 @@
 
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { Sun, Moon, BookOpen, Menu, X } from 'lucide-react';
+import { Sun, Moon, BookOpen, Menu, X, LayoutDashboard, Shield } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Nav() {
   const { theme, setTheme } = useTheme();
-  const { user, logout, isInstructor } = useAuth();
+  const { user, logout, isInstructor, isAdmin } = useAuth();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+
+  const handleLogout = async () => {
+    setMenuOpen(false);
+    await logout();
+    router.push('/auth/login');
+  };
 
   return (
     <header
@@ -56,13 +64,21 @@ export default function Nav() {
 
           {user ? (
             <>
+              {isAdmin && (
+                <Link href="/admin">
+                  <Button variant="ghost" size="sm" className="gap-1.5">
+                    <Shield size={14} />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <Link href="/dashboard">
                 <Button variant="ghost" size="sm" className="gap-1.5">
                   <BookOpen size={14} />
                   My Learning
                 </Button>
               </Link>
-              <Button variant="secondary" size="sm" onClick={logout}>
+              <Button variant="secondary" size="sm" onClick={handleLogout}>
                 Sign out
               </Button>
             </>
@@ -101,10 +117,17 @@ export default function Nav() {
           <div className="border-t border-[var(--border)] mt-2 pt-2 flex flex-col gap-2">
             {user ? (
               <>
+                {isAdmin && (
+                  <Link href="/admin" onClick={() => setMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full gap-1.5">
+                      <Shield size={14} /> Admin
+                    </Button>
+                  </Link>
+                )}
                 <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full">My Learning</Button>
                 </Link>
-                <Button variant="ghost" size="sm" onClick={logout} className="w-full">Sign out</Button>
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="w-full">Sign out</Button>
               </>
             ) : (
               <>

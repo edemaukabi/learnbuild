@@ -115,6 +115,11 @@ export default function LearnRoom({ slug }: { slug: string }) {
     load();
   }, [slug, user, authLoading, router]);
 
+  const handleSelectLesson = useCallback((lesson: LessonItem) => {
+    setCurrentLesson(lesson);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) setSidebarOpen(false);
+  }, []);
+
   const toggleComplete = useCallback(async () => {
     if (!currentLesson) return;
     const res = await api.post<{ completed: boolean }>(`/progress/${currentLesson.id}/toggle`);
@@ -226,15 +231,23 @@ export default function LearnRoom({ slug }: { slug: string }) {
       )}
 
       {/* Body */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Lesson sidebar */}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile backdrop — lesson sidebar */}
         {sidebarOpen && (
-          <aside className="w-72 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] overflow-y-auto">
+          <div
+            className="md:hidden fixed inset-0 z-30 bg-black/60"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Lesson sidebar — overlay on mobile, in-flow on desktop */}
+        {sidebarOpen && (
+          <aside className="fixed md:static top-14 bottom-0 left-0 z-40 md:z-auto w-72 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] overflow-y-auto">
             <LessonSidebar
               sections={sections}
               currentLessonId={currentLesson?.id ?? ''}
               completedIds={completedIds}
-              onSelect={setCurrentLesson}
+              onSelect={handleSelectLesson}
             />
           </aside>
         )}
@@ -259,9 +272,17 @@ export default function LearnRoom({ slug }: { slug: string }) {
           )}
         </main>
 
-        {/* Notes panel */}
+        {/* Mobile backdrop — notes panel */}
         {notesOpen && currentLesson && (
-          <aside className="w-80 shrink-0 border-l border-[var(--border)] bg-[var(--surface)] overflow-y-auto">
+          <div
+            className="md:hidden fixed inset-0 z-30 bg-black/60"
+            onClick={() => setNotesOpen(false)}
+          />
+        )}
+
+        {/* Notes panel — overlay on mobile, in-flow on desktop */}
+        {notesOpen && currentLesson && (
+          <aside className="fixed md:static top-14 bottom-0 right-0 z-40 md:z-auto w-80 shrink-0 border-l border-[var(--border)] bg-[var(--surface)] overflow-y-auto">
             <NotesPanel lessonId={currentLesson.id} />
           </aside>
         )}

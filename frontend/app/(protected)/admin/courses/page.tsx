@@ -114,7 +114,8 @@ export default function AdminCoursesPage() {
       </div>
 
       <div className="rounded-xl border border-[var(--border)] overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[700px]">
           <thead>
             <tr className="border-b border-[var(--border)] bg-[var(--card)]">
               <th className="px-4 py-3 text-left text-xs font-medium text-[var(--fg-4)]">Course</th>
@@ -169,6 +170,7 @@ export default function AdminCoursesPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {meta && meta.totalPages > 1 && (

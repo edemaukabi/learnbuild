@@ -54,7 +54,12 @@ function LoginForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-[var(--fg-2)]">Password</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-medium text-[var(--fg-2)]">Password</label>
+          <Link href="/auth/forgot-password" className="text-xs text-[var(--sky)] hover:text-[var(--sky-2)] transition-colors">
+            Forgot password?
+          </Link>
+        </div>
         <div className="relative">
           <Input
             type={showPassword ? 'text' : 'password'}
