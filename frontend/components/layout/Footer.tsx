@@ -8,9 +8,11 @@ export default function Footer() {
           <div className="brand-mark" />
           <span className="text-sm font-medium text-[var(--fg)]">LearnBuild</span>
         </div>
-        <p className="text-xs text-[var(--fg-3)]">
+
+        <p className="text-xs text-[var(--fg-4)]">
           &copy; {new Date().getFullYear()} LearnBuild. All rights reserved.
         </p>
+
         <div className="flex items-center gap-4 text-xs text-[var(--fg-3)]">
           <Link href="/catalog" className="hover:text-[var(--fg)] transition-colors">
             Catalog
@@ -18,6 +20,15 @@ export default function Footer() {
           <Link href="/auth/login" className="hover:text-[var(--fg)] transition-colors">
             Sign in
           </Link>
+          <span className="text-[var(--border-strong)]">·</span>
+          <a
+            href="https://edemaukabi.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[var(--fg)] transition-colors"
+          >
+            Built by Edema Ukabi
+          </a>
         </div>
       </div>
     </footer>
