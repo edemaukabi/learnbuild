@@ -62,7 +62,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
     Promise.all([
-      api.get<DashboardData>('/users/dashboard'),
+      api.get<DashboardData>('/users/me/dashboard'),
       api.get<Certificate[]>('/certificates'),
     ])
       .then(([dashRes, certRes]) => {
