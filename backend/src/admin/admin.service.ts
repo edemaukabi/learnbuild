@@ -85,6 +85,12 @@ export class AdminService {
     });
   }
 
+  async deleteUser(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+    await this.prisma.user.delete({ where: { id } });
+  }
+
   async getCourses(query: AdminCourseQueryDto) {
     const { status, search, page = 1, limit = 20 } = query;
     const skip = (page - 1) * limit;
@@ -134,6 +140,12 @@ export class AdminService {
       },
       select: { id: true, title: true, status: true },
     });
+  }
+
+  async deleteCourse(id: string) {
+    const course = await this.prisma.course.findUnique({ where: { id } });
+    if (!course) throw new NotFoundException('Course not found');
+    await this.prisma.course.delete({ where: { id } });
   }
 
   // --- Category management ---

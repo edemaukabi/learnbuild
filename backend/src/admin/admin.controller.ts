@@ -47,6 +47,12 @@ export class AdminController {
     return this.admin.updateUserRole(id, dto.role);
   }
 
+  @Delete('users/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteUser(@Param('id') id: string) {
+    return this.admin.deleteUser(id);
+  }
+
   @Get('courses')
   getCourses(@Query() query: AdminCourseQueryDto) {
     return this.admin.getCourses(query);
@@ -55,6 +61,12 @@ export class AdminController {
   @Patch('courses/:id/status')
   updateCourseStatus(@Param('id') id: string, @Body() dto: UpdateCourseStatusDto) {
     return this.admin.updateCourseStatus(id, dto.status);
+  }
+
+  @Delete('courses/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteCourse(@Param('id') id: string) {
+    return this.admin.deleteCourse(id);
   }
 
   @Get('categories')

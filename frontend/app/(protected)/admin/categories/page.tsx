@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import api from '@/lib/api';
 
 interface Category {
@@ -21,6 +22,7 @@ export default function AdminCategoriesPage() {
   const [icon, setIcon] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
 
   const load = () => {
     api.get<Category[]>('/admin/categories')
@@ -49,14 +51,11 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete category "${name}"? Courses in this category will become uncategorised.`)) return;
-    try {
-      await api.delete(`/admin/categories/${id}`);
-      setCategories((prev) => prev.filter((c) => c.id !== id));
-    } catch {
-      //
-    }
+  const handleDeleteConfirm = async () => {
+    if (!pendingDelete) return;
+    await api.delete(`/admin/categories/${pendingDelete.id}`);
+    setCategories((prev) => prev.filter((c) => c.id !== pendingDelete.id));
+    setPendingDelete(null);
   };
 
   return (
@@ -101,8 +100,8 @@ export default function AdminCategoriesPage() {
                 </div>
               </div>
               <button
-                onClick={() => handleDelete(cat.id, cat.name)}
-                className="text-[var(--fg-4)] hover:text-[var(--rose)] transition-colors p-1"
+                onClick={() => setPendingDelete(cat)}
+                className="text-[var(--fg-4)] hover:text-[var(--rose)] hover:bg-[var(--rose)]/10 rounded-md p-1.5 transition-colors"
               >
                 <Trash2 size={14} />
               </button>
@@ -110,6 +109,16 @@ export default function AdminCategoriesPage() {
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        title="Delete category"
+        description={pendingDelete ? `Are you sure you want to delete "${pendingDelete.name}"?` : ''}
+        details={pendingDelete ? `${pendingDelete._count.courses} course${pendingDelete._count.courses !== 1 ? 's' : ''} in this category will become uncategorised. The courses themselves will not be deleted.` : ''}
+        confirmLabel="Delete category"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
