@@ -17,6 +17,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CourseQueryDto } from './dto/course-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtOptionalGuard } from '../auth/guards/jwt-optional.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -44,6 +45,7 @@ export class CoursesController {
     return this.coursesService.findBySlug(slug);
   }
 
+  @UseGuards(JwtOptionalGuard)
   @Get(':slug/curriculum')
   findCurriculum(@Param('slug') slug: string, @CurrentUser() user?: User) {
     return this.coursesService.findCurriculum(slug, user?.id);
