@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Param,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -29,6 +30,11 @@ export class InstructorController {
   @Get('stats')
   getStats(@CurrentUser() user: User) {
     return this.instructor.getStats(user.id);
+  }
+
+  @Get('courses/:id')
+  getCourse(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.instructor.getCourseForEditor(id, user.id, user.role);
   }
 
   @Post('videos')

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -24,6 +24,13 @@ export class InstructorService {
     await this.storage.upload(key, fileBuffer, mimeType);
     this.logger.log(`Video uploaded to R2: ${key}`);
     return { videoId: key };
+  }
+
+  async getCourseForEditor(courseId: string, userId: string, role: string) {
+    const course = await this.prisma.course.findUnique({ where: { id: courseId } });
+    if (!course) throw new NotFoundException('Course not found');
+    if (role !== 'ADMIN' && course.instructorId !== userId) throw new ForbiddenException('You do not own this course');
+    return course;
   }
 
   async getStats(instructorId: string) {

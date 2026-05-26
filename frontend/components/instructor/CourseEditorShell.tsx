@@ -37,7 +37,7 @@ export default function CourseEditorShell({ courseId }: { courseId: string }) {
 
   useEffect(() => {
     Promise.all([
-      api.get<CourseDetail>(`/courses/${courseId}`).catch(() => api.get<CourseDetail>(`/courses/${courseId}`)),
+      api.get<CourseDetail>(`/instructor/courses/${courseId}`),
       api.get<Category[]>('/categories'),
     ])
       .then(([courseRes, catRes]) => {
@@ -49,7 +49,7 @@ export default function CourseEditorShell({ courseId }: { courseId: string }) {
   }, [courseId]);
 
   const refreshCourse = () => {
-    api.get<CourseDetail>(`/courses/${courseId}`).then((r) => setCourse(r.data)).catch(() => {});
+    api.get<CourseDetail>(`/instructor/courses/${courseId}`).then((r) => setCourse(r.data)).catch(() => {});
   };
 
   if (loading || !course) {
