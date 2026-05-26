@@ -27,6 +27,7 @@ export class SectionsService {
     const count = await this.prisma.section.count({ where: { courseId } });
     return this.prisma.section.create({
       data: { courseId, title: dto.title, order: count },
+      include: { lessons: { orderBy: { order: 'asc' } } },
     });
   }
 
