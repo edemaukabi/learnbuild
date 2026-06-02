@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
@@ -16,16 +16,16 @@ function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [serverError, setServerError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
-    setError('');
+    setServerError('');
+    if (!password) { setPasswordError('Password is required'); return; }
+    if (password.length < 8) { setPasswordError('Password must be at least 8 characters'); return; }
+
     setLoading(true);
     try {
       await api.post('/auth/reset-password', { token, password });
@@ -33,7 +33,7 @@ function ResetPasswordForm() {
       setTimeout(() => router.push('/auth/login'), 3000);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(typeof msg === 'string' ? msg : 'Invalid or expired reset link.');
+      setServerError(typeof msg === 'string' ? msg : 'Invalid or expired reset link.');
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-[var(--fg-2)]">New password</label>
         <div className="relative">
@@ -71,11 +71,9 @@ function ResetPasswordForm() {
             type={showPassword ? 'text' : 'password'}
             autoComplete="new-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); if (passwordError) setPasswordError(''); }}
             placeholder="Min. 8 characters"
-            required
-            minLength={8}
-            className="pr-10"
+            className={`pr-10${passwordError ? ' border-[var(--rose)] focus:border-[var(--rose)]' : ''}`}
           />
           <button
             type="button"
@@ -87,11 +85,16 @@ function ResetPasswordForm() {
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
+        {passwordError && (
+          <p className="flex items-center gap-1 text-xs text-[var(--rose)] mt-1">
+            <AlertCircle size={12} className="shrink-0" /> {passwordError}
+          </p>
+        )}
       </div>
 
-      {error && (
+      {serverError && (
         <p className="text-xs text-[var(--rose)] bg-[var(--rose)]/10 border border-[var(--rose)]/20 rounded-md px-3 py-2">
-          {error}
+          {serverError}
         </p>
       )}
 

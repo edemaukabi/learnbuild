@@ -3,10 +3,21 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function FieldError({ msg }: { msg: string }) {
+  if (!msg) return null;
+  return (
+    <p className="flex items-center gap-1 text-xs text-[var(--rose)] mt-1">
+      <AlertCircle size={12} className="shrink-0" /> {msg}
+    </p>
+  );
+}
 
 function LoginForm() {
   const { login, user } = useAuth();
@@ -17,7 +28,8 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -26,7 +38,13 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setServerError('');
+    const newErrors = { email: '', password: '' };
+    if (!email.trim()) newErrors.email = 'Email is required';
+    else if (!emailRegex.test(email)) newErrors.email = 'Enter a valid email address';
+    if (!password) newErrors.password = 'Password is required';
+    if (newErrors.email || newErrors.password) { setErrors(newErrors); return; }
+
     setLoading(true);
     try {
       await login(email, password);
@@ -34,24 +52,25 @@ function LoginForm() {
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(typeof msg === 'string' ? msg : 'Invalid email or password.');
+      setServerError(typeof msg === 'string' ? msg : 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-[var(--fg-2)]">Email</label>
         <Input
           type="email"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: '' })); }}
           placeholder="you@example.com"
-          required
+          className={errors.email ? 'border-[var(--rose)] focus:border-[var(--rose)]' : ''}
         />
+        <FieldError msg={errors.email} />
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
@@ -65,10 +84,9 @@ function LoginForm() {
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors((p) => ({ ...p, password: '' })); }}
             placeholder="••••••••"
-            required
-            className="pr-10"
+            className={`pr-10${errors.password ? ' border-[var(--rose)] focus:border-[var(--rose)]' : ''}`}
           />
           <button
             type="button"
@@ -80,11 +98,12 @@ function LoginForm() {
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
+        <FieldError msg={errors.password} />
       </div>
 
-      {error && (
+      {serverError && (
         <p className="text-xs text-[var(--rose)] bg-[var(--rose)]/10 border border-[var(--rose)]/20 rounded-md px-3 py-2">
-          {error}
+          {serverError}
         </p>
       )}
 

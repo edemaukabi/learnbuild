@@ -1,10 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { Category } from '@/types';
+
+function FieldError({ msg }: { msg: string }) {
+  if (!msg) return null;
+  return (
+    <p className="flex items-center gap-1 text-xs text-[var(--rose)] mt-1">
+      <AlertCircle size={12} className="shrink-0" /> {msg}
+    </p>
+  );
+}
 
 interface CourseInfo {
   id: string;
@@ -47,13 +57,17 @@ export default function InfoTab({
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [titleError, setTitleError] = useState('');
   const [error, setError] = useState('');
 
-  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
+    if (key === 'title' && titleError) setTitleError('');
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.title.trim()) { setTitleError('Course title is required'); return; }
     setSaving(true);
     setError('');
     try {
@@ -82,11 +96,16 @@ export default function InfoTab({
   };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <form onSubmit={handleSave} noValidate className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="md:col-span-2 space-y-1.5">
           <label className="text-xs font-medium text-[var(--fg-2)]">Course title *</label>
-          <Input value={form.title} onChange={set('title')} required />
+          <Input
+            value={form.title}
+            onChange={set('title')}
+            className={titleError ? 'border-[var(--rose)] focus:border-[var(--rose)]' : ''}
+          />
+          <FieldError msg={titleError} />
         </div>
 
         <div className="md:col-span-2 space-y-1.5">

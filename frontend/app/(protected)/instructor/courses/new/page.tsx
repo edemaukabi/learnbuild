@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,15 +58,20 @@ export default function NewCoursePage() {
         Enter the basics — you can fill in all the details in the editor.
       </p>
 
-      <form onSubmit={handleCreate} className="space-y-5">
+      <form onSubmit={handleCreate} noValidate className="space-y-5">
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-[var(--fg-2)]">Course title *</label>
           <Input
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => { setTitle(e.target.value); if (error && !e.target.value.trim()) return; if (error) setError(''); }}
             placeholder="e.g. Complete React Developer Course"
-            required
+            className={error && !title.trim() ? 'border-[var(--rose)] focus:border-[var(--rose)]' : ''}
           />
+          {error && !title.trim() && (
+            <p className="flex items-center gap-1 text-xs text-[var(--rose)] mt-1">
+              <AlertCircle size={12} className="shrink-0" /> {error}
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">

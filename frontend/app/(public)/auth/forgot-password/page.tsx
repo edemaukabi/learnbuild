@@ -2,26 +2,32 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Mail } from 'lucide-react';
+import { Mail, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setServerError('');
+    if (!email.trim()) { setEmailError('Email is required'); return; }
+    if (!emailRegex.test(email)) { setEmailError('Enter a valid email address'); return; }
+
     setLoading(true);
     try {
       await api.post('/auth/forgot-password', { email });
       setSent(true);
     } catch {
-      setError('Something went wrong. Please try again.');
+      setServerError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -63,22 +69,27 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-[var(--fg-2)]">Email address</label>
               <Input
                 type="email"
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError(''); }}
                 placeholder="you@example.com"
-                required
+                className={emailError ? 'border-[var(--rose)] focus:border-[var(--rose)]' : ''}
               />
+              {emailError && (
+                <p className="flex items-center gap-1 text-xs text-[var(--rose)] mt-1">
+                  <AlertCircle size={12} className="shrink-0" /> {emailError}
+                </p>
+              )}
             </div>
 
-            {error && (
+            {serverError && (
               <p className="text-xs text-[var(--rose)] bg-[var(--rose)]/10 border border-[var(--rose)]/20 rounded-md px-3 py-2">
-                {error}
+                {serverError}
               </p>
             )}
 
